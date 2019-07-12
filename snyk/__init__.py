@@ -1,16 +1,17 @@
 '''
-    from snyk import Snky
+import os
+from snyk import Snyk
 
-    snyk = Snyk(os.environ['SNYK_TOKEN'])
-    snyk.orgs()
-    >>> [SnykOrg]
+snyk = Snyk(os.environ['SNYK_TOKEN'])
+snyk.orgs()
+>>> [Org, Org]
 '''
 from __future__ import annotations
 
 import json
 from urllib.parse import urljoin
 from urllib.request import urlopen, Request
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 
 SNYK_API_URL = 'https://snyk.io/api/v1/'
@@ -87,7 +88,13 @@ class Group:
 
 class Org:
 
-    def __init__(self, client: HTTPClient, name: str, id: str, group: Group):
+    def __init__(
+        self,
+        client: HTTPClient,
+        name: str,
+        id: str,
+        group: Optional[Group],
+    ):
         self.client = client
         self.name = name
         self.id = id
@@ -143,7 +150,9 @@ class Snyk:
         orgs = []
         groups: Dict[str, Group] = {}
         for org in data.get('orgs', []):
-            if org['group']['id'] in groups:
+            if not org['group']:
+                group = None
+            elif org['group']['id'] in groups:
                 group = groups[org['group']['id']]
             else:
                 group = Group(

@@ -31,6 +31,11 @@ class TestOrgs(unittest.TestCase):
                      },
                      'name': 'RabOrg',
                      'id': 'eeeeeeee-bbbb-4172-dddd-aaaaaaaaaaaa'
+                  },
+                  {
+                     'group': None,
+                     'name': 'BOrg',
+                     'id': 'iiiiiiii-bbbb-4172-dddd-aaaaaaaaaaaa'
                   }
                ]
             }),
@@ -45,7 +50,7 @@ class TestOrgs(unittest.TestCase):
         httpretty.disable()
 
     def test_two_orgs(self):
-        assert len(self.orgs) == 2
+        assert len(self.orgs) == 3
 
     def test_org_name(self):
         assert self.orgs[0].name == 'BarOrg'
