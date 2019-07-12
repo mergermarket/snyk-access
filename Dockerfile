@@ -17,6 +17,10 @@ COPY ./snyk ./snyk
 COPY ./tests ./tests
 COPY *.py ./
 
+FROM test AS testrun
+
+RUN py.test --flake8 --cov --mypy --mypy-ignore-missing-imports
+
 FROM base AS main
 
 RUN pipenv install --system
