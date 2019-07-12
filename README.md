@@ -1,4 +1,5 @@
 # Snyk Access
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mergermarket/snyk-access.svg)
 
 Imports projects from GitHub into Synk.
 
