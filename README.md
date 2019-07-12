@@ -1,6 +1,6 @@
 # Snyk Access
 
-Imports projects from GitHub import Synk.
+Imports projects from GitHub into Synk.
 
 ## Usage
 ```bash
