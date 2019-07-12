@@ -1,4 +1,4 @@
-FROM python:3.7 AS base
+FROM python:3.7.4-alpine3.10 AS base
 
 WORKDIR /opt/
 
@@ -6,12 +6,16 @@ ENV PYTHONPATH=/opt/
 
 COPY Pipfile Pipfile.lock ./
 
-RUN pip install pipenv && \
-    pipenv install --system
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev && \
+    pip install pipenv && \
+    pipenv install --system && \
+    apk del .build-deps
 
 FROM base AS test
 
-RUN pipenv install --system --dev
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev && \
+    pipenv install --system --dev && \
+    apk del .build-deps
 
 COPY ./snyk ./snyk
 COPY ./tests ./tests
@@ -22,8 +26,6 @@ FROM test AS testrun
 RUN py.test --flake8 --cov --mypy --mypy-ignore-missing-imports
 
 FROM base AS main
-
-RUN pipenv install --system
 
 COPY ./snyk ./snyk
 COPY *.py ./
