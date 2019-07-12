@@ -2,7 +2,7 @@ FROM python:3.7 AS base
 
 WORKDIR /opt/
 
-ENV PYTHONPATH=.
+ENV PYTHONPATH=/opt/
 
 COPY Pipfile Pipfile.lock ./
 
@@ -15,3 +15,13 @@ RUN pipenv install --system --dev
 
 COPY ./snyk ./snyk
 COPY ./tests ./tests
+COPY *.py ./
+
+FROM base AS main
+
+RUN pipenv install --system
+
+COPY ./snyk ./snyk
+COPY *.py ./
+
+ENTRYPOINT ["python", "/opt/snyk_access.py"]

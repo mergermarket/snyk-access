@@ -1,13 +1,31 @@
-# Snyk SDK
+# Snyk Access
 
-For interacting with the Snyk API in Python (>= 3.7).
+Imports projects from GitHub import Synk.
 
 ## Usage
-```python
-import os
-from snyk import Snyk
+```bash
+docker container run --rm \
+    -e SNYK_TOKEN \
+    -v $(pwd):$(pwd) \
+    -w $(pwd) \
+    mergermarket/snyk-access --owner <github-owner> --org <snyk-org> --access-file ./access.json
+```
 
-snyk = Snyk(os.environ['SNYK_TOKEN'])
-snyk.orgs()
->>> [Org, Org]
+Example of minimal `access.json` config:
+```json
+[
+  {
+    "apps": {
+      "snyk": [
+        "first-repo",
+        "second-repo"
+      ]
+    }
+  }
+]
+```
+
+## Run tests
+```bash
+./test.sh
 ```
