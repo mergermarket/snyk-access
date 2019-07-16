@@ -58,7 +58,9 @@ class HTTPClient:
             method='POST',
         )
         response = urlopen(request, timeout=self.timeout)
+        data = json.load(response)
         response.close()
+        return data
 
     def delete(self, path: str) -> None:
         api_url = urljoin(self.url, path)
@@ -83,7 +85,8 @@ class Group:
         body = {'name': name}
         if source_org:
             body['sourceOrgId'] = source_org.id
-        self.client.post_json(path, body)
+        data = self.client.post_json(path, body)
+        return Org(self.client, data['name'], data['id'], self)
 
 
 class Org:
