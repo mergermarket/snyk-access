@@ -117,22 +117,32 @@ class Org:
     def projects(self) -> List[Project]:
         data = self.client.get_json(f'org/{self.id}/projects')
         return [
-            Project(self.client, d['name'], d['id'], self)
-            for d in data['projects']
+            Project(self.client, datum, self)
+            for datum in data['projects']
         ]
 
 
 class Project:
 
-    def __init__(self, client: HTTPClient, name: str, id: str, org: Org):
+    origin: str
+    name: str
+    id: str
+
+    def __init__(self, client: HTTPClient, attrs: Dict, org: Org):
+        self.__dict__ = attrs
         self.client = client
-        self.name = name
-        self.id = id
         self.org = org
 
     def delete(self):
         path = f'org/{self.org.id}/project/{self.id}'
         self.client.delete(path)
+
+    @property
+    def repo_name(self) -> Optional[str]:
+        if self.origin != 'github':
+            return None
+        else:
+            return self.name.split('/', 1)[1].split(':', 1)[0]
 
 
 class Snyk:
