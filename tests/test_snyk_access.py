@@ -120,3 +120,82 @@ class TestSnykAccess(unittest.TestCase):
                 call('owner', 'project-a'),
                 call('owner', 'project-b'),
             ])
+
+    @patch('snyk_access.Snyk')
+    @patch.dict('snyk_access.os.environ', {'SNYK_TOKEN': 'token'})
+    def test_remove_projects_not_listed(self, Snyk):
+        snyk_client = MagicMock(spec=snyk.Snyk)
+        http_client = MagicMock(spec=snyk.HTTPClient)
+        group = MagicMock(spec=snyk.Group)
+        orgs = [
+            snyk.Org(http_client, f'team-{i}', str(i), group)
+            for i in range(10)
+        ]
+        org_name = 'myorg'
+        org = MagicMock(spec=snyk.Org)
+        org.client = http_client
+        org.name = org_name
+        org.id = '42'
+        org.group = group
+        org.projects.return_value = [
+            snyk.Project(
+                http_client,
+                {
+                    'id': '1',
+                    'name': 'owner/project-c:requirements.txt',
+                    'origin': 'github',
+                },
+                org,
+            ),
+            snyk.Project(
+                http_client,
+                {
+                    'id': '2',
+                    'name': 'owner/project-d:requirements.txt',
+                    'origin': 'github',
+                },
+                org,
+            ),
+        ]
+        orgs.append(org)
+        snyk_client.orgs.return_value = orgs
+        Snyk.return_value = snyk_client
+
+        data = [
+            {
+                'teams': {
+                    'foo-team': 'pull',
+                },
+                'apps': {
+                    'snyk': [
+                        'project-a',
+                        'project-b',
+                    ],
+                },
+                'repos': [
+                    'project-a',
+                    'project-b',
+                    'project-c',
+                    'project-d',
+                ],
+            },
+            {
+                'teams': {
+                    'bar-team': 'push',
+                },
+                'repos': [
+                    'project-e',
+                ],
+            },
+        ]
+
+        with patch('snyk_access.open', mock_open(read_data=json.dumps(data))):
+
+            snyk_access.main('owner', 'myorg', 'access.json')
+
+            assert http_client.delete.call_count == 2
+
+            http_client.delete.assert_has_calls([
+                call('org/42/project/1'),
+                call('org/42/project/2'),
+            ])

@@ -4,7 +4,7 @@ import os
 from typing import Any, List
 import logging
 
-from snyk import Snyk, Org
+from snyk import Snyk, Org, Project
 
 
 logging.basicConfig(format='[%(asctime)s] %(message)s',
@@ -25,6 +25,16 @@ def repos_to_import(data: List[Any]) -> List[str]:
     return snyk_repos
 
 
+def projects_to_delete(
+    projects: List[Project],
+    imported_repos: List[str],
+) -> List[Project]:
+    return [
+        project for project in projects
+        if project.repo_name not in imported_repos
+    ]
+
+
 def main(owner: str, org_name: str, filename: str) -> None:
     logger.info(
         f'Importing GitHub repos from {owner} into {org_name} org in Snyk'
@@ -37,9 +47,18 @@ def main(owner: str, org_name: str, filename: str) -> None:
     with open(filename) as f:
         data = json.load(f)
 
-    for repo in repos_to_import(data):
+    repos: List[str] = repos_to_import(data)
+
+    for repo in repos:
         logger.info(f'Importing {repo}')
         org.import_github_project(owner, repo)
+
+    projects: List[Project] = org.projects()
+
+    to_delete = projects_to_delete(projects, repos)
+
+    for project in to_delete:
+        project.delete()
 
 
 if __name__ == '__main__':

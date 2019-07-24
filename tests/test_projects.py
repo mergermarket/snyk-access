@@ -5,7 +5,7 @@ import httpretty
 import snyk
 
 
-class TestProjectDelete(unittest.TestCase):
+class TestProject(unittest.TestCase):
 
     def setUp(self):
         httpretty.enable(allow_net_connect=False)
@@ -25,7 +25,24 @@ class TestProjectDelete(unittest.TestCase):
             'a1',
             snyk.Group(client, 'foo', '1'),
         )
-        self.project = snyk.Project(client, 'p-foo', 42, org)
+        data = {
+            'id': '42',
+            'issueCountsBySeverity': {
+                'medium': 2,
+                'low': 0,
+                'high': 0
+            },
+            'created': '2019-06-18T22:20:10.232Z',
+            'totalDependencies': 16,
+            'readOnly': False,
+            'type': 'pip',
+            'imageTag': '0.0.0',
+            'lastTestedDate': '2019-07-08T06:16:26.386Z',
+            'testFrequency': 'daily',
+            'origin': 'github',
+            'name': 'owner/p-foo:requirements.txt'
+        }
+        self.project = snyk.Project(client, data, org)
 
     def tearDown(self):
         httpretty.disable()
@@ -36,3 +53,6 @@ class TestProjectDelete(unittest.TestCase):
         request = httpretty.last_request()
 
         assert request.method == httpretty.DELETE
+
+    def test_repo_name(self):
+        assert self.project.repo_name == 'p-foo'
