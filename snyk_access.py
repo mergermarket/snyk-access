@@ -31,7 +31,10 @@ def projects_to_delete(
 ) -> List[Project]:
     return [
         project for project in projects
-        if project.repo_name not in imported_repos
+        if (
+            project.origin == 'github' and
+            project.repo_name not in imported_repos
+        )
     ]
 
 

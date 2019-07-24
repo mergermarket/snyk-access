@@ -156,6 +156,15 @@ class TestSnykAccess(unittest.TestCase):
                 },
                 org,
             ),
+            snyk.Project(
+                http_client,
+                {
+                    'id': '3',
+                    'name': 'project-x',
+                    'origin': 'cli',
+                },
+                org,
+            ),
         ]
         orgs.append(org)
         snyk_client.orgs.return_value = orgs
