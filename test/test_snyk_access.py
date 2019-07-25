@@ -6,7 +6,7 @@ import snyk
 import snyk_access
 
 
-class TestSnykAccess(unittest.TestCase):
+class TestFindOrg(unittest.TestCase):
 
     def test_find_org(self):
         snyk_client = MagicMock(spec=snyk.Snyk)
@@ -24,7 +24,10 @@ class TestSnykAccess(unittest.TestCase):
 
         assert org.id == '42'
 
-    def test_find_repos_to_import(self):
+
+class TestFindRepos(unittest.TestCase):
+
+    def test_snyk_app_in_one_block(self):
         data = [
             {
                 'teams': {
@@ -56,6 +59,122 @@ class TestSnykAccess(unittest.TestCase):
         repos = snyk_access.repos_to_import(data)
 
         assert sorted(repos) == ['project-a', 'project-b']
+
+    def test_snyk_app_enabled_in_two_blocks(self):
+        data = [
+            {
+                'teams': {
+                    'foo-team': 'pull',
+                },
+                'apps': {
+                    'snyk': True,
+                },
+                'repos': [
+                    'project-a',
+                    'project-b',
+                    'project-c',
+                    'project-d',
+                ],
+            },
+            {
+                'teams': {
+                    'bar-team': 'push',
+                },
+                'apps': {
+                    'snyk': True,
+                },
+                'repos': [
+                    'project-e',
+                ],
+            },
+        ]
+
+        repos = snyk_access.repos_to_import(data)
+
+        assert sorted(repos) == [
+            'project-a',
+            'project-b',
+            'project-c',
+            'project-d',
+            'project-e',
+        ]
+
+    def test_snyk_app_in_two_blocks_enabled_and_listed(self):
+        data = [
+            {
+                'teams': {
+                    'foo-team': 'pull',
+                },
+                'apps': {
+                    'snyk': [
+                        'project-a',
+                        'project-b',
+                    ],
+                },
+                'repos': [
+                    'project-a',
+                    'project-b',
+                    'project-c',
+                    'project-d',
+                ],
+            },
+            {
+                'teams': {
+                    'bar-team': 'push',
+                },
+                'apps': {
+                    'snyk': True,
+                },
+                'repos': [
+                    'project-e',
+                ],
+            },
+        ]
+
+        repos = snyk_access.repos_to_import(data)
+
+        assert sorted(repos) == ['project-a', 'project-b', 'project-e']
+
+    def test_snyk_app_in_two_blocks(self):
+        data = [
+            {
+                'teams': {
+                    'foo-team': 'pull',
+                },
+                'apps': {
+                    'snyk': [
+                        'project-a',
+                        'project-b',
+                    ],
+                },
+                'repos': [
+                    'project-a',
+                    'project-b',
+                    'project-c',
+                    'project-d',
+                ],
+            },
+            {
+                'teams': {
+                    'bar-team': 'push',
+                },
+                'apps': {
+                    'snyk': [
+                        'project-e',
+                    ],
+                },
+                'repos': [
+                    'project-e',
+                ],
+            },
+        ]
+
+        repos = snyk_access.repos_to_import(data)
+
+        assert sorted(repos) == ['project-a', 'project-b', 'project-e']
+
+
+class TestSnykAccess(unittest.TestCase):
 
     @patch('snyk_access.Snyk')
     @patch.dict('snyk_access.os.environ', {'SNYK_TOKEN': 'token'})

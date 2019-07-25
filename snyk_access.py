@@ -1,7 +1,7 @@
 import argparse
 import json
 import os
-from typing import Any, List
+from typing import cast, Any, List, Union
 import logging
 
 from snyk import Snyk, Org, Project
@@ -21,7 +21,11 @@ def find_org(snyk: Snyk, org_name: str) -> Org:
 def repos_to_import(data: List[Any]) -> List[str]:
     snyk_repos: List[str] = []
     for obj in data:
-        snyk_repos += obj.get('apps', {}).get('snyk', [])
+        snyk: Union[List[str], bool] = obj.get('apps', {}).get('snyk', [])
+        if type(snyk) is bool and snyk is True:
+            snyk_repos += obj.get('repos', [])
+        elif type(snyk) is not bool:
+            snyk_repos += cast(List[str], snyk)
     return snyk_repos
 
 
@@ -61,6 +65,7 @@ def main(owner: str, org_name: str, filename: str) -> None:
     to_delete = projects_to_delete(projects, repos)
 
     for project in to_delete:
+        logger.info(f'Removing {project.name}')
         project.delete()
 
 
