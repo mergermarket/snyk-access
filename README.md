@@ -26,6 +26,36 @@ Example of minimal `access.json` config:
 ]
 ```
 
+Example of more complex `access.json` config:
+```json
+[
+  {
+    "apps": {
+      "snyk": true
+    },
+    "repos": [
+      "first-repo",
+      "second-repo",
+      "third-repo",
+      "fourth-repo"
+    ]
+  },
+  {
+    "apps": {
+      "snyk": [
+        "fifth-repo"
+      ]
+    },
+    "repos": [
+        "fifth-repo",
+        "a-repo",
+        "b-repo",
+        "c-repo"
+    ]
+  }
+]
+```
+
 ## Run tests
 ```bash
 ./test.sh
