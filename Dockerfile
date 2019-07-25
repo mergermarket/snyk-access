@@ -18,7 +18,7 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev && \
     apk del .build-deps
 
 COPY ./snyk ./snyk
-COPY ./tests ./tests
+COPY ./test ./test
 COPY *.py ./
 
 FROM test AS testrun
