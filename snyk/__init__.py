@@ -91,6 +91,9 @@ class Group:
 
 class Org:
 
+    _integrations: Dict[str, Any]
+    _projects: List[Project]
+
     def __init__(
         self,
         client: HTTPClient,
@@ -105,7 +108,11 @@ class Org:
 
     @property
     def integrations(self) -> Dict[str, Any]:
-        return self.client.get_json(f'org/{self.id}/integrations')
+        if not hasattr(self, '_integrations'):
+            self._integrations = self.client.get_json(
+                f'org/{self.id}/integrations',
+            )
+        return self._integrations
 
     def import_github_project(self, owner: str, name: str):
         github_integration_id = self.integrations['github']
@@ -114,12 +121,15 @@ class Org:
             {'target': {'owner': owner, 'name': name, 'branch': 'master'}}
         )
 
+    @property
     def projects(self) -> List[Project]:
-        data = self.client.get_json(f'org/{self.id}/projects')
-        return [
-            Project(self.client, datum, self)
-            for datum in data['projects']
-        ]
+        if not hasattr(self, '_projects'):
+            data = self.client.get_json(f'org/{self.id}/projects')
+            self._projects = [
+                Project(self.client, datum, self)
+                for datum in data['projects']
+            ]
+        return self._projects
 
 
 class Project:

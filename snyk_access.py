@@ -60,9 +60,7 @@ def main(owner: str, org_name: str, filename: str) -> None:
         logger.info(f'Importing {repo}')
         org.import_github_project(owner, repo)
 
-    projects: List[Project] = org.projects()
-
-    to_delete = projects_to_delete(projects, repos)
+    to_delete = projects_to_delete(org.projects, repos)
 
     for project in to_delete:
         logger.info(f'Removing {project.name}')

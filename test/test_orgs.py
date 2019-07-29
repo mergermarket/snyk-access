@@ -191,7 +191,7 @@ class TestListProjects(unittest.TestCase):
             'a1',
             snyk.Group(client, 'foo', '1'),
         )
-        self.projects = org.projects()
+        self.projects = org.projects
 
     def tearDown(self):
         httpretty.disable()

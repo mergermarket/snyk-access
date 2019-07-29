@@ -256,7 +256,7 @@ class TestSnykAccess(unittest.TestCase):
         org.name = org_name
         org.id = '42'
         org.group = group
-        org.projects.return_value = [
+        org.projects = [
             snyk.Project(
                 http_client,
                 {
