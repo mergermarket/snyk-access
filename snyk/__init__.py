@@ -15,7 +15,7 @@ from typing import List, Dict, Any, Optional
 
 
 SNYK_API_URL = 'https://snyk.io/api/v1/'
-TIMEOUT = 10
+TIMEOUT = 20
 
 
 class SnykError(Exception):
