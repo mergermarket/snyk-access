@@ -1,9 +1,10 @@
 import argparse
 import json
-import os
-from typing import cast, Any, List, Union
 import logging
+import os
+import time
 
+from typing import cast, Any, List, Union
 from snyk import Snyk, Org, Project
 
 
@@ -59,6 +60,7 @@ def main(owner: str, org_name: str, filename: str) -> None:
     for repo in repos:
         logger.info(f'Importing {repo}')
         org.import_github_project(owner, repo)
+        time.sleep(0.8)
 
     to_delete = projects_to_delete(org.projects, repos)
 
