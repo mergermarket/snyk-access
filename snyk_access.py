@@ -60,7 +60,7 @@ def main(owner: str, org_name: str, filename: str) -> None:
     for repo in repos:
         logger.info(f'Importing {repo}')
         org.import_github_project(owner, repo)
-        time.sleep(0.5)
+        time.sleep(1)
 
     to_delete = projects_to_delete(org.projects, repos)
 
