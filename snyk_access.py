@@ -59,7 +59,15 @@ def main(owner: str, org_name: str, filename: str) -> None:
 
     for repo in repos:
         logger.info(f'Importing {repo}')
-        org.import_github_project(owner, repo)
+        try:
+            org.import_github_project(owner, repo)
+        except Exception as e:
+            logger.info(
+                f'Error importing {repo} ({str(e)}). '
+                'Waiting and trying again...'
+            )
+            time.sleep(5)
+            org.import_github_project(owner, repo)
         time.sleep(1)
 
     to_delete = projects_to_delete(org.projects, repos)
