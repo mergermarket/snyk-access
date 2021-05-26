@@ -1,0 +1,30 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "07:00"
+    timezone: Europe/London
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: pytest-randomly
+    versions:
+    - 3.5.0
+    - 3.6.0
+  - dependency-name: pytest
+    versions:
+    - 6.2.2
+  - dependency-name: mypy
+    versions:
+    - "0.800"
+  - dependency-name: pytest-mypy
+    versions:
+    - 0.8.0
+- package-ecosystem: docker
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "07:00"
+    timezone: Europe/London
+  open-pull-requests-limit: 10
